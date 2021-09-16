@@ -1,6 +1,9 @@
 <template>
   <h1>Events For Good</h1>
   <div class="events">
+    <div class="search-box">
+      <BaseInput v-model="keyword" type="text" label="Search..." @input="updateKeyword"/>
+    </div>
     <EventCard v-for="event in events" :key="event.id" :event="event" />
     <div class="pagination">
       <router-link
@@ -28,6 +31,7 @@
 // @ is an alias to /src
 import EventCard from '@/components/EventCard.vue'
 import EventService from '@/services/EventService.js'
+import BaseInput from "@/components/BaseInput";
 
 // import axios from 'axios'
 export default {
@@ -39,12 +43,14 @@ export default {
     }
   },
   components: {
+    BaseInput,
     EventCard // register it as a child component
   },
   data() {
     return {
       events: null,
-      totalEvents: 0 // <--- Added this to store totalEvents
+      totalEvents: 0, // <--- Added this to store totalEvents
+      keyword: null
     }
   },
 
@@ -71,6 +77,26 @@ export default {
         return { name: 'NetworkError' }
       })
   },
+  methods:{
+    updateKeyword(){
+      var queryFunction
+      if (this.keyword === ''){
+        queryFunction=EventService.getEvents(3,1)
+      } else {
+        queryFunction = EventService.getEvents(3,1)
+      }
+      queryFunction
+          .then((response) => {
+            this.events = response.data
+            console.log(this.events)
+            this.totalEvents = response.headers['x-total-count']
+            console.log(this.totalEvents)
+          })
+          .catch(()=>{
+            return { name: 'NetworkError'}
+          })
+    }
+  },
   computed: {
     hasNextPage() {
       // First, calculate total pages
@@ -79,7 +105,8 @@ export default {
       // Then check to see if the current page is less than the total pages.
       return this.page < totalPages
     }
-  }
+  },
+
 }
 </script>
 <style scoped>
@@ -88,6 +115,10 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+.search-box{
+  width: 300px;
+}
+
 .pagination {
   display: flex;
   width: 290px;
