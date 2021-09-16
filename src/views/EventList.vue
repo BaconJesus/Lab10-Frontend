@@ -83,7 +83,7 @@ export default {
       if (this.keyword === ''){
         queryFunction=EventService.getEvents(3,1)
       } else {
-        queryFunction = EventService.getEvents(3,1)
+        queryFunction = EventService.getEventByKeyword(this.keyword,3,1)
       }
       queryFunction
           .then((response) => {
